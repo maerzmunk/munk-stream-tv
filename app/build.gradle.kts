@@ -367,7 +367,8 @@ baselineProfile {
 }
 
 sentry {
-    includeProguardMapping.set(true)
+    includeProguardMapping.set(false) // Munk Stream: no Sentry uploads
+    ignoredBuildTypes.set(setOf("debug", "release"))
     autoUploadProguardMapping.set(sentryMappingUploadEnabled)
     uploadNativeSymbols.set(false)
     autoUploadNativeSymbols.set(false)
