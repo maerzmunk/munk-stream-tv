@@ -101,7 +101,7 @@ android {
     ndkVersion = "29.0.14206865"
 
     defaultConfig {
-        applicationId = "com.nuvio.tv"
+        applicationId = "com.munk.stream.tv"
         minSdk = 24
         targetSdk = 36
         versionCode = 1062
@@ -145,8 +145,9 @@ android {
         buildConfigField("String", "SENTRY_DSN", buildConfigString(sentryDsn))
 
         // In-app updater (GitHub Releases)
-        buildConfigField("String", "GITHUB_OWNER", "\"NuvioMedia\"")
-        buildConfigField("String", "GITHUB_REPO", "\"NuvioTV\"")
+        buildConfigField("String", "GITHUB_OWNER", "\"maerzmunk\"")
+        buildConfigField("String", "GITHUB_REPO", "\"munk-stream-tv\"")
+        buildConfigField("String", "MUNK_OWNER_PIN", buildConfigString(localProperties.getProperty("MUNK_OWNER_PIN", "")))
     }
 
     flavorDimensions += "distribution"
@@ -334,7 +335,7 @@ android {
 androidComponents {
     onVariants(selector().withBuildType("debug")) { variant ->
         val isPlaystore = variant.productFlavors.any { it.second == "playstore" }
-        variant.applicationId.set(if (isPlaystore) "com.nuvio.appdebug" else "com.nuviodebug.com")
+        variant.applicationId.set(if (isPlaystore) "com.nuvio.appdebug" else "com.munk.stream.tv.debug")
     }
 }
 

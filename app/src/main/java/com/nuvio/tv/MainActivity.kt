@@ -840,6 +840,15 @@ open class MainActivity : ComponentActivity() {
                     val navBackStackEntry by navController.currentBackStackEntryAsState()
                     val actualRoute = navBackStackEntry?.destination?.route
                     val currentRoute = optimisticRoute ?: actualRoute
+                    // Munk Stream: leaving settings for a main tab locks the owner area again.
+                    LaunchedEffect(actualRoute) {
+                        val r = actualRoute ?: return@LaunchedEffect
+                        if (r == Screen.Home.route || r == Screen.Search.route || r == Screen.Library.route ||
+                            r == Screen.Discover.route || r.startsWith("${Screen.Discover.route}/")
+                        ) {
+                            com.nuvio.tv.ui.owner.OwnerGate.lock()
+                        }
+                    }
                     startupDestination = startupDestinationForRoute(actualRoute ?: startDestination)
 
                     LaunchedEffect(actualRoute) {
@@ -971,6 +980,11 @@ open class MainActivity : ComponentActivity() {
                                 }
                             }
                             is AppDeepLink.AddonInstall -> {
+                                if (!com.nuvio.tv.ui.owner.OwnerGate.unlocked) {
+                                    // Munk Stream: members cannot install add-ons from outside links.
+                                    pendingDeepLinkUrl.value = null
+                                    return@LaunchedEffect
+                                }
                                 navController.navigate(Screen.AddonManager.route) {
                                     launchSingleTop = true
                                 }

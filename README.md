@@ -1,32 +1,26 @@
 <div align="center">
 
-  <img src="assets/brand/app_logo_wordmark.png" alt="Nuvio" width="300" />
+  <img src="app/src/main/res/drawable/app_logo_wordmark.png" alt="Munk Stream" width="320" />
 
-  <p>
-    A free, open-source media app for your phone, your desktop, and the TV you already own.
-    <br />
-    Bring your own sources. Nuvio turns them into a library with artwork, ratings, subtitles, and your place saved on every screen.
-  </p>
+  <p>Munk Stream TV: app streaming Maerz untuk Android TV dan TV box.</p>
 
-  [Website](https://nuvio.tv) · [GitHub releases](https://github.com/NuvioMedia/NuvioTV/releases/latest) · [Support Nuvio](https://nuvio.tv/support)
+  [Muat turun versi terbaru](https://github.com/maerzmunk/munk-stream-tv/releases/latest)
 
 </div>
 
-## Get Nuvio TV
+## Pasang
 
-- [Android TV on Google Play](https://play.google.com/store/apps/details?id=com.nuvio.app)
-- [Android TV APK](https://github.com/NuvioMedia/NuvioTV/releases/latest)
+Buka [Releases](https://github.com/maerzmunk/munk-stream-tv/releases/latest) dan pilih APK:
 
-## Build from source
+- `armeabi-v7a`: kebanyakan Android TV dan TV box (Mi TV, Mi Box, Mi TV Stick). Pilih ini jika tak pasti.
+- `arm64-v8a`: TV box 64-bit (contohnya Nvidia Shield, Google TV Streamer).
 
-```bash
-git clone https://github.com/NuvioMedia/NuvioTV.git
-cd NuvioTV
-./gradlew :app:assembleFullDebug
-```
+Lepas pasang, app akan beritahu sendiri bila ada versi baru.
 
-Nuvio TV is built with Kotlin, Jetpack Compose, TV Material 3, and Media3. Development requires Android Studio, a JDK, and the Android SDK.
+Untuk telefon, guna [Munk Stream](https://github.com/maerzmunk/munk-stream).
 
-## License
+## Kredit dan lesen
 
-[GNU General Public License v3.0](./LICENSE)
+Munk Stream TV dibina atas [Nuvio TV](https://github.com/NuvioMedia/NuvioTV) oleh NuvioMedia,
+dengan jenama, logo dan tetapan diubah. Kod asal dan kod ini dilesenkan di bawah GPL-3.0
+(lihat [LICENSE](LICENSE)). README asal Nuvio ada di [NUVIO-README.md](NUVIO-README.md).

@@ -1192,6 +1192,12 @@ private fun PlaybackNavHost(
         }
 
         composable(Screen.Settings.route) {
+            com.nuvio.tv.ui.owner.OwnerGated(onBack = {
+                navController.navigate(Screen.Home.route) {
+                    popUpTo(navController.graph.startDestinationId) { saveState = false }
+                    launchSingleTop = true
+                }
+            }) {
             SettingsScreen(
                 showBuiltInHeader = !hideBuiltInHeaders,
                 onNavigateToTracking = { navController.navigate(Screen.Tracking.route) },
@@ -1207,40 +1213,52 @@ private fun PlaybackNavHost(
                 }
             )
         }
+        }
 
         composable(Screen.ManageProfiles.route) {
+            com.nuvio.tv.ui.owner.OwnerGated(onBack = { navController.popBackStack() }) {
             ProfileSelectionScreen(
                 onProfileSelected = {},
                 screenMode = ProfileSelectionMode.Management,
                 onBackPress = { navController.popBackStack() }
             )
         }
+        }
 
         composable(Screen.Tracking.route) {
+            com.nuvio.tv.ui.owner.OwnerGated(onBack = { navController.popBackStack() }) {
             TrackingSettingsScreen(
                 onBackPress = { navController.popBackStack() }
             )
         }
+        }
 
         composable(Screen.TmdbSettings.route) {
+            com.nuvio.tv.ui.owner.OwnerGated(onBack = { navController.popBackStack() }) {
             TmdbSettingsScreen(
                 onBackPress = { navController.popBackStack() }
             )
         }
+        }
 
         composable(Screen.ThemeSettings.route) {
+            com.nuvio.tv.ui.owner.OwnerGated(onBack = { navController.popBackStack() }) {
             ThemeSettingsScreen(
                 onBackPress = { navController.popBackStack() }
             )
         }
+        }
 
         composable(Screen.PlaybackSettings.route) {
+            com.nuvio.tv.ui.owner.OwnerGated(onBack = { navController.popBackStack() }) {
             PlaybackSettingsScreen(
                 onBackPress = { navController.popBackStack() }
             )
         }
+        }
 
         composable(Screen.About.route) {
+            com.nuvio.tv.ui.owner.OwnerGated(onBack = { navController.popBackStack() }) {
             AboutScreen(
                 onBackPress = { navController.popBackStack() },
                 onNavigateToSupportersContributors = {
@@ -1251,22 +1269,28 @@ private fun PlaybackNavHost(
                 }
             )
         }
+        }
 
         if (AppFeaturePolicy.supportNuvioEnabled) {
             composable(Screen.SupportersContributors.route) {
+            com.nuvio.tv.ui.owner.OwnerGated(onBack = { navController.popBackStack() }) {
                 SupportersContributorsScreen(
                     onBackPress = { navController.popBackStack() }
                 )
             }
         }
+        }
 
         composable(Screen.LicensesAttributions.route) {
+            com.nuvio.tv.ui.owner.OwnerGated(onBack = { navController.popBackStack() }) {
             LicensesAttributionsScreen(
                 onBackPress = { navController.popBackStack() }
             )
         }
+        }
 
         composable(Screen.AddonManager.route) {
+            com.nuvio.tv.ui.owner.OwnerGated(onBack = { navController.popBackStack() }) {
             AddonManagerScreen(
                 showBuiltInHeader = !hideBuiltInHeaders,
                 onBackPress = { navController.popBackStack() },
@@ -1274,11 +1298,14 @@ private fun PlaybackNavHost(
                 onNavigateToCollections = { navController.navigate(Screen.Collections.route) }
             )
         }
+        }
 
         composable(Screen.CatalogOrder.route) {
+            com.nuvio.tv.ui.owner.OwnerGated(onBack = { navController.popBackStack() }) {
             CatalogOrderScreen(
                 onBackPress = { navController.popBackStack() }
             )
+        }
         }
 
         composable(Screen.Collections.route) {
@@ -1323,34 +1350,44 @@ private fun PlaybackNavHost(
 
         if (AppFeaturePolicy.pluginsEnabled) {
             composable(Screen.Plugins.route) {
+            com.nuvio.tv.ui.owner.OwnerGated(onBack = { navController.popBackStack() }) {
                 PluginScreen(
                     onBackPress = { navController.popBackStack() }
                 )
             }
         }
+        }
 
         composable(Screen.Account.route) {
+            com.nuvio.tv.ui.owner.OwnerGated(onBack = { navController.popBackStack() }) {
             AuthQrSignInScreen(
                 onBackPress = { navController.popBackStack() }
             )
+        }
         }
 
         composable(Screen.AuthSignIn.route) {
+            com.nuvio.tv.ui.owner.OwnerGated(onBack = { navController.popBackStack() }) {
             AuthQrSignInScreen(
                 onBackPress = { navController.popBackStack() }
             )
+        }
         }
 
         composable(Screen.AuthQrSignIn.route) {
+            com.nuvio.tv.ui.owner.OwnerGated(onBack = { navController.popBackStack() }) {
             AuthQrSignInScreen(
                 onBackPress = { navController.popBackStack() }
             )
         }
+        }
 
         composable(Screen.LayoutSettings.route) {
+            com.nuvio.tv.ui.owner.OwnerGated(onBack = { navController.popBackStack() }) {
             LayoutSettingsScreen(
                 onBackPress = { navController.popBackStack() }
             )
+        }
         }
 
         composable(
