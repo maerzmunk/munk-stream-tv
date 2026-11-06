@@ -101,7 +101,7 @@ android {
     ndkVersion = "29.0.14206865"
 
     defaultConfig {
-        applicationId = "com.munk.stream.tv"
+        applicationId = "com.nuvio.tv"
         minSdk = 24
         targetSdk = 36
         versionCode = 1062
@@ -145,9 +145,8 @@ android {
         buildConfigField("String", "SENTRY_DSN", buildConfigString(sentryDsn))
 
         // In-app updater (GitHub Releases)
-        buildConfigField("String", "GITHUB_OWNER", "\"maerzmunk\"")
-        buildConfigField("String", "GITHUB_REPO", "\"munk-stream-tv\"")
-        buildConfigField("String", "MUNK_OWNER_PIN", buildConfigString(localProperties.getProperty("MUNK_OWNER_PIN", "")))
+        buildConfigField("String", "GITHUB_OWNER", "\"NuvioMedia\"")
+        buildConfigField("String", "GITHUB_REPO", "\"NuvioTV\"")
     }
 
     flavorDimensions += "distribution"
@@ -335,7 +334,7 @@ android {
 androidComponents {
     onVariants(selector().withBuildType("debug")) { variant ->
         val isPlaystore = variant.productFlavors.any { it.second == "playstore" }
-        variant.applicationId.set(if (isPlaystore) "com.nuvio.appdebug" else "com.munk.stream.tv.debug")
+        variant.applicationId.set(if (isPlaystore) "com.nuvio.appdebug" else "com.nuviodebug.com")
     }
 }
 
@@ -367,8 +366,7 @@ baselineProfile {
 }
 
 sentry {
-    includeProguardMapping.set(false) // Munk Stream: no Sentry uploads
-    ignoredBuildTypes.set(setOf("debug", "release"))
+    includeProguardMapping.set(true)
     autoUploadProguardMapping.set(sentryMappingUploadEnabled)
     uploadNativeSymbols.set(false)
     autoUploadNativeSymbols.set(false)
@@ -552,4 +550,23 @@ dependencies {
     testImplementation("io.mockk:mockk:1.13.12")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+}
+
+// ---------------------------------------------------------------------------
+// Munk Stream overrides. Kept at the end of the file so that merging new
+// Nuvio TV releases rarely conflicts with them.
+// ---------------------------------------------------------------------------
+val munkVersionName = rootProject.file("munk/VERSION").readText().trim()
+
+android {
+    defaultConfig {
+        applicationId = "com.munk.stream.tv"
+        versionName = munkVersionName
+        buildConfigField("String", "MUNK_OWNER_PIN", buildConfigString(localProperties.getProperty("MUNK_OWNER_PIN", "")))
+    }
+}
+
+sentry {
+    includeProguardMapping.set(false)
+    ignoredBuildTypes.set(setOf("debug", "release"))
 }

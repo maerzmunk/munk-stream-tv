@@ -1,0 +1,116 @@
+name: Auto-update from Nuvio
+
+# Every Sunday 02:00 Malaysia time: if Nuvio released a new version, bring it in,
+# build signed Munk Stream APKs, publish a Release (members see the update banner)
+# On conflicts it opens an issue instead.
+on:
+  schedule:
+    - cron: "0 18 * * 6"
+  workflow_dispatch:
+    inputs:
+      nuvio_tag:
+        description: Optional Nuvio tag to update to (default = Nuvio's latest release)
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+  actions: write
+  issues: write
+
+concurrency:
+  group: auto-update
+  cancel-in-progress: false
+
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GITHUB_TOKEN: ${{ github.token }}
+      FORCE_NUVIO_TAG: ${{ inputs.nuvio_tag }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Configure git
+        run: |
+          git config user.name "munk-stream-robot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Bring in the new Nuvio release
+        id: nuvio
+        run: python3 munk/nuvio_update.py tv
+
+      - name: Set up Java
+        if: steps.nuvio.outputs.updated == 'true'
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Set up Gradle
+        if: steps.nuvio.outputs.updated == 'true'
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Write signing key and runtime properties
+        if: steps.nuvio.outputs.updated == 'true'
+        env:
+          PROPS: ${{ secrets.MUNK_LOCAL_PROPERTIES_BASE64 }}
+          KEYSTORE: ${{ secrets.MUNK_KEYSTORE_BASE64 }}
+        run: |
+          if [[ -z "$PROPS" || -z "$KEYSTORE" ]]; then
+            echo "Secrets MUNK_LOCAL_PROPERTIES_BASE64 / MUNK_KEYSTORE_BASE64 missing." >&2
+            exit 1
+          fi
+          printf '%s' "$KEYSTORE" | base64 --decode > "$RUNNER_TEMP/munk-release.jks"
+          printf '%s' "$PROPS" | base64 --decode > local.properties
+          printf '\nsdk.dir=%s\nNUVIO_RELEASE_STORE_FILE=%s\n' "$ANDROID_HOME" "$RUNNER_TEMP/munk-release.jks" >> local.properties
+          cat >> local.properties <<'EOF'
+          USE_LOCAL_FFMPEG_DECODER=false
+          DOVI_NATIVE_ENABLED=true
+          DOVI_EXTRACTOR_HOOK_READY=true
+          DOVI_ENABLE_REAL_LINK=true
+          DOVI_LIBDOVI_PREBUILT_ROOT=DV7/libdovi
+          EOF
+
+      - name: Build signed APKs
+        if: steps.nuvio.outputs.updated == 'true'
+        run: ./gradlew :app:assembleFullRelease --no-daemon --stacktrace
+
+      - name: Publish release
+        if: steps.nuvio.outputs.updated == 'true'
+        env:
+          VERSION: ${{ steps.nuvio.outputs.version }}
+          NUVIO_TAG: ${{ steps.nuvio.outputs.nuvio_tag }}
+        run: |
+          out=app/build/outputs/apk/full/release
+          mkdir -p dist
+          for abi in arm64-v8a armeabi-v7a; do
+            cp "$out/app-full-${abi}-release.apk" "dist/MunkStreamTV-${VERSION}-${abi}.apk"
+          done
+          git commit -q -m "Munk Stream TV ${VERSION}: ikut Nuvio ${NUVIO_TAG}"
+          git push origin HEAD:main
+          gh release create "v${VERSION}" dist/*.apk \
+            --target main \
+            --title "Munk Stream TV ${VERSION}" \
+            --notes "Update automatik: ikut Nuvio ${NUVIO_TAG} (https://github.com/NuvioMedia/NuvioTV/releases/tag/${NUVIO_TAG})."
+
+      - name: Report conflicts or failure
+        if: failure()
+        env:
+          NUVIO_TAG: ${{ steps.nuvio.outputs.nuvio_tag }}
+          CONFLICTS: ${{ steps.nuvio.outputs.conflicts }}
+        run: |
+          gh issue create \
+            --title "Robot auto-update gagal (Nuvio ${NUVIO_TAG:-?})" \
+            --body "Robot tak dapat buat update automatik. Ahli masih guna versi lama (tiada kesan pada mereka).
+
+          Fail yang bertembung: ${CONFLICTS:-tiada, tengok log}
+          Log: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+          Minta Claude betulkan: buka sesi Munk Stream dan bagi link ni."

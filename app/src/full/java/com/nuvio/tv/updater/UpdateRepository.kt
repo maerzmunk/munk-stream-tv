@@ -16,8 +16,8 @@ class UpdateRepository @Inject constructor(
 
     suspend fun getLatestUpdate(channel: UpdateChannel): Result<AppUpdate> {
         return runCatching {
-            val owner = BuildConfig.GITHUB_OWNER
-            val repo = BuildConfig.GITHUB_REPO
+            val owner = "maerzmunk" // Munk Stream
+            val repo = "munk-stream-tv" // Munk Stream
 
             val releases = when (channel) {
                 UpdateChannel.STABLE -> {
