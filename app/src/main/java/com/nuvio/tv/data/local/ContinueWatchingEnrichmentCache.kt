@@ -40,7 +40,8 @@ data class CachedNextUpItem(
     val isNewSeasonRelease: Boolean = false,
     val seedSeason: Int? = null,
     val seedEpisode: Int? = null,
-    val contentLanguage: String? = null
+    val contentLanguage: String? = null,
+    val ratingVisible: Boolean = true
 )
 
 data class CachedInProgressItem(
@@ -63,7 +64,8 @@ data class CachedInProgressItem(
     val episodeImdbRating: Float? = null,
     val genres: List<String> = emptyList(),
     val releaseInfo: String? = null,
-    val contentLanguage: String? = null
+    val contentLanguage: String? = null,
+    val ratingVisible: Boolean = true
 )
 
 @Singleton
@@ -105,7 +107,8 @@ class ContinueWatchingEnrichmentCache @Inject constructor(
             try {
                 val file = nextUpFile()
                 if (!file.exists()) return@withContext emptyList()
-                gson.fromJson(file.readText(), object : TypeToken<List<CachedNextUpItem>>() {}.type)
+                gson.fromJson<List<CachedNextUpItem>>(file.readText(), object : TypeToken<List<CachedNextUpItem>>() {}.type)
+                    ?.filter { isValidCacheEntry(it.contentId, it.contentType) }
                     ?: emptyList()
             } catch (e: Exception) {
                 Log.w(TAG, "Failed to read next-up cache: ${e.message}")
@@ -151,7 +154,8 @@ class ContinueWatchingEnrichmentCache @Inject constructor(
             try {
                 val file = inProgressFile()
                 if (!file.exists()) return@withContext emptyList()
-                gson.fromJson(file.readText(), object : TypeToken<List<CachedInProgressItem>>() {}.type)
+                gson.fromJson<List<CachedInProgressItem>>(file.readText(), object : TypeToken<List<CachedInProgressItem>>() {}.type)
+                    ?.filter { isValidCacheEntry(it.contentId, it.contentType) }
                     ?: emptyList()
             } catch (e: Exception) {
                 Log.w(TAG, "Failed to read in-progress cache: ${e.message}")
@@ -212,3 +216,9 @@ class ContinueWatchingEnrichmentCache @Inject constructor(
     }
 
 }
+
+// Munk Stream: Gson can leave non-null Kotlin fields null when a cached row is incomplete.
+// Such rows crashed the home screen (isDroppedShow(contentId) NPE), so drop them on read.
+@Suppress("SENSELESS_COMPARISON")
+private fun isValidCacheEntry(contentId: String?, contentType: String?): Boolean =
+    !contentId.isNullOrBlank() && contentType != null

@@ -166,7 +166,7 @@ interface WatchProgressRepository {
     /**
      * Returns true if the show is dropped/hidden from progress on the active source.
      */
-    fun isDroppedShow(contentId: String): Boolean
+    fun isDroppedShow(contentId: String?): Boolean
 
     fun hasActiveTrackingProgressProvider(): Boolean
     fun activeProviderOwnsCompletedHistoryProjection(): Boolean
