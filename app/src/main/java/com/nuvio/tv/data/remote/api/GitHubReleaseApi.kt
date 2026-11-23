@@ -6,6 +6,7 @@ import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
+import retrofit2.http.Url
 
 interface GitHubReleaseApi {
 
@@ -21,6 +22,10 @@ interface GitHubReleaseApi {
         @Path("repo") repo: String,
         @Query("per_page") perPage: Int = 100
     ): Response<List<GitHubReleaseDto>>
+
+    /** Munk Stream: release copy on the Maerz server (munk-cermin), same JSON as GitHub. */
+    @GET
+    suspend fun getReleaseAt(@Url url: String): Response<GitHubReleaseDto>
 
     @GET("repos/{owner}/{repo}/contributors")
     suspend fun getContributors(

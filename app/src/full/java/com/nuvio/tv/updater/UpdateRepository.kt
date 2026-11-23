@@ -16,25 +16,13 @@ class UpdateRepository @Inject constructor(
 
     suspend fun getLatestUpdate(channel: UpdateChannel): Result<AppUpdate> {
         return runCatching {
-            val owner = "maerzmunk" // Munk Stream
-            val repo = "munk-stream-tv" // Munk Stream
-
-            val releases = when (channel) {
-                UpdateChannel.STABLE -> {
-                    val response = gitHubReleaseApi.getLatestRelease(owner = owner, repo = repo)
-                    if (!response.isSuccessful) {
-                        error("GitHub API error: ${response.code()}")
-                    }
-                    listOf(response.body() ?: error("Empty GitHub release response"))
-                }
-                UpdateChannel.BETA -> {
-                    val response = gitHubReleaseApi.getReleases(owner = owner, repo = repo)
-                    if (!response.isSuccessful) {
-                        error("GitHub API error: ${response.code()}")
-                    }
-                    response.body() ?: error("Empty GitHub release response")
-                }
+            // Munk Stream: update diambil dari server Maerz (salinan release GitHub oleh munk-cermin),
+            // jadi banner update masih jalan kalau GitHub ada masalah. Satu release je (stable).
+            val response = gitHubReleaseApi.getReleaseAt("https://89-167-20-85.nip.io/munk-update/tv.json")
+            if (!response.isSuccessful) {
+                error("Update server error: ${response.code()}")
             }
+            val releases = listOf(response.body() ?: error("Empty update response"))
             val releaseWithAsset = ReleaseSelector
                 .eligibleReleases(releases, channel)
                 .firstNotNullOfOrNull { release ->

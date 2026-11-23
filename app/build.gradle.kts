@@ -618,7 +618,7 @@ android {
     defaultConfig {
         applicationId = "com.munk.stream.tv"
         versionName = munkVersionName
-        buildConfigField("String", "MUNK_OWNER_PIN", buildConfigString(localProperties.getProperty("MUNK_OWNER_PIN", "")))
+        // Owner PIN is checked by the Maerz server (ui/owner/OwnerGate.kt), not built into the app.
     }
 }
 
